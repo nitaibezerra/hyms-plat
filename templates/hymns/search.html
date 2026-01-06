@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Buscar Hinos - Portal de Hinários do Santo Daime{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 2rem; color: #2c5282; margin-bottom: 1.5rem;">Buscar Hinos</h1>
+
+<div class="card">
+    <form action="{% url 'hymns:search' %}" method="get">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Buscar por título, letra ou nome do hinário..."
+            class="search-bar"
+            autofocus
+        >
+        <button type="submit" class="btn">Buscar</button>
+    </form>
+</div>
+
+{% if query %}
+    <div style="margin: 1.5rem 0;">
+        <h2 style="font-size: 1.25rem; color: #2d3748;">
+            {% if total > 0 %}
+                {{ total }} resultado{{ total|pluralize }} para "{{ query }}"
+            {% else %}
+                Nenhum resultado encontrado para "{{ query }}"
+            {% endif %}
+        </h2>
+    </div>
+
+    {% if results %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for hymn in results %}
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 1.5rem;">
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 1.25rem; color: #2c5282; margin-bottom: 0.5rem;">
+                                <a href="{% url 'hymns:hymn_detail' hymn.pk %}" style="color: inherit; text-decoration: none;">
+                                    {{ hymn.number }}. {{ hymn.title }}
+                                </a>
+                            </h3>
+                            <p style="color: #718096; margin-bottom: 0.75rem;">
+                                <a href="{% url 'hymns:hymnbook_detail' hymn.hymn_book.slug %}" style="color: inherit; text-decoration: none;">
+                                    {{ hymn.hymn_book.name }}
+                                </a>
+                                {% if hymn.hymn_book.owner_name %}
+                                    — {{ hymn.hymn_book.owner_name }}
+                                {% endif %}
+                            </p>
+                            <div style="color: #4a5568; font-size: 0.875rem; line-height: 1.6;">
+                                {{ hymn.text|truncatewords:40 }}
+                            </div>
+                            {% if hymn.style %}
+                                <p style="color: #718096; margin-top: 0.5rem; font-size: 0.875rem;">
+                                    <strong>Estilo:</strong> {{ hymn.style }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="{% url 'hymns:hymn_detail' hymn.pk %}" class="btn">
+                                Ver Hino
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif query %}
+        <div class="card">
+            <p style="color: #718096; text-align: center;">
+                Não foi possível encontrar hinos com os termos buscados. Tente usar outras palavras-chave.
+            </p>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="card">
+        <p style="color: #718096; text-align: center;">
+            Digite um termo de busca para encontrar hinos.
+        </p>
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+            <h3 style="font-size: 1rem; color: #2d3748; margin-bottom: 0.75rem;">Dicas de busca:</h3>
+            <ul style="color: #4a5568; padding-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;">Busque por palavras do título do hino</li>
+                <li style="margin-bottom: 0.5rem;">Busque por trechos da letra</li>
+                <li style="margin-bottom: 0.5rem;">Busque pelo nome do hinário</li>
+                <li style="margin-bottom: 0.5rem;">Busque pelo nome do autor/recebedor</li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

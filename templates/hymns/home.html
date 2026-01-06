@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Portal de Hinários do Santo Daime{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1 style="font-size: 2.5rem; color: #2c5282; margin-bottom: 1rem;">Portal de Hinários do Santo Daime</h1>
+    <p style="font-size: 1.25rem; color: #4a5568; margin-bottom: 2rem;">
+        Explore e pesquise os hinários do Santo Daime
+    </p>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-number">{{ total_hymnbooks }}</div>
+            <div class="stat-label">Hinários</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_hymns }}</div>
+            <div class="stat-label">Hinos</div>
+        </div>
+    </div>
+
+    <form action="{% url 'hymns:search' %}" method="get" style="margin: 2rem 0;">
+        <input
+            type="text"
+            name="q"
+            placeholder="Buscar hinos por título, letra ou hinário..."
+            class="search-bar"
+            autofocus
+        >
+        <button type="submit" class="btn">Buscar</button>
+    </form>
+</div>
+
+<section style="margin-top: 3rem;">
+    <h2 style="font-size: 1.75rem; color: #2d3748; margin-bottom: 1.5rem;">Hinários Recentes</h2>
+
+    {% if recent_hymnbooks %}
+        <div class="grid">
+            {% for hymnbook in recent_hymnbooks %}
+                <div class="card">
+                    {% if hymnbook.cover_image %}
+                        <img
+                            src="{{ hymnbook.cover_image.url }}"
+                            alt="{{ hymnbook.name }}"
+                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 1rem;"
+                        >
+                    {% endif %}
+                    <h3 style="font-size: 1.25rem; color: #2c5282; margin-bottom: 0.5rem;">
+                        <a href="{% url 'hymns:hymnbook_detail' hymnbook.slug %}" style="color: inherit; text-decoration: none;">
+                            {{ hymnbook.name }}
+                        </a>
+                    </h3>
+                    <p style="color: #718096; margin-bottom: 0.5rem;">
+                        {{ hymnbook.owner_name }}
+                    </p>
+                    <p style="color: #4a5568; font-size: 0.875rem;">
+                        {{ hymnbook.hymn_count }} hino{{ hymnbook.hymn_count|pluralize }}
+                    </p>
+                    {% if hymnbook.description %}
+                        <p style="color: #4a5568; margin-top: 0.75rem; font-size: 0.875rem;">
+                            {{ hymnbook.description|truncatewords:20 }}
+                        </p>
+                    {% endif %}
+                    <a href="{% url 'hymns:hymnbook_detail' hymnbook.slug %}" class="btn" style="margin-top: 1rem; display: inline-block;">
+                        Ver Hinário
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="color: #718096;">Nenhum hinário disponível no momento.</p>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'hymns:hymnbook_list' %}" class="btn btn-secondary">Ver Todos os Hinários</a>
+    </div>
+</section>
+{% endblock %}

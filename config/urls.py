@@ -15,7 +15,9 @@ urlpatterns = [
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("accounts/", include("allauth.urls")),
-    # For now, Wagtail handles the root URL, later we'll add custom apps
+    # Hymns app URLs (before Wagtail catch-all)
+    path("", include("apps.hymns.urls")),
+    # Wagtail handles remaining URLs
     path("", include(wagtail_urls)),
 ]
 

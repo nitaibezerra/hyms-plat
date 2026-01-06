@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hymn.number }}. {{ hymn.title }} - {{ hymn.hymn_book.name }}{% endblock %}
+
+{% block content %}
+<nav style="margin-bottom: 1.5rem;">
+    <a href="{% url 'hymns:hymnbook_detail' hymn.hymn_book.slug %}" class="btn btn-secondary">
+        &larr; Voltar para {{ hymn.hymn_book.name }}
+    </a>
+</nav>
+
+<article class="card">
+    <header style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 2rem; font-weight: 700; color: #2c5282;">{{ hymn.number }}</span>
+            <h1 style="font-size: 1.75rem; color: #2d3748;">{{ hymn.title }}</h1>
+        </div>
+        <p style="color: #718096; font-size: 1rem;">
+            <a href="{% url 'hymns:hymnbook_detail' hymn.hymn_book.slug %}" style="color: #2c5282; text-decoration: none;">
+                {{ hymn.hymn_book.name }}
+            </a>
+            {% if hymn.hymn_book.owner_name %}
+                — {{ hymn.hymn_book.owner_name }}
+            {% endif %}
+        </p>
+    </header>
+
+    <section>
+        <div class="hymn-text">{{ hymn.text }}</div>
+    </section>
+
+    {% if hymn.received_at or hymn.offered_to or hymn.style or hymn.extra_instructions or hymn.repetitions %}
+        <section style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e2e8f0;">
+            <h2 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 1rem;">Informações</h2>
+            <div class="metadata">
+                {% if hymn.style %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Estilo</div>
+                        <div class="metadata-value">{{ hymn.style }}</div>
+                    </div>
+                {% endif %}
+
+                {% if hymn.received_at %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Recebido em</div>
+                        <div class="metadata-value">{{ hymn.received_at|date:"d/m/Y" }}</div>
+                    </div>
+                {% endif %}
+
+                {% if hymn.offered_to %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Oferecido para</div>
+                        <div class="metadata-value">{{ hymn.offered_to }}</div>
+                    </div>
+                {% endif %}
+
+                {% if hymn.repetitions %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Repetições</div>
+                        <div class="metadata-value">{{ hymn.repetitions }}</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if hymn.extra_instructions %}
+                <div style="margin-top: 1rem;">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Instruções Extras</div>
+                        <div class="metadata-value" style="white-space: pre-line;">{{ hymn.extra_instructions }}</div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+</article>
+
+{% comment %}
+Navigation to previous/next hymn could be added here if desired
+{% endcomment %}
+{% endblock %}

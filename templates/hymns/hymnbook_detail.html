@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hymnbook.name }} - Portal de Hinários do Santo Daime{% endblock %}
+
+{% block content %}
+<nav style="margin-bottom: 1.5rem;">
+    <a href="{% url 'hymns:hymnbook_list' %}" class="btn btn-secondary">&larr; Voltar para Hinários</a>
+</nav>
+
+<div class="card">
+    <div style="display: flex; gap: 2rem; align-items: start;">
+        {% if hymnbook.cover_image %}
+            <img
+                src="{{ hymnbook.cover_image.url }}"
+                alt="{{ hymnbook.name }}"
+                style="width: 300px; height: 400px; object-fit: cover; border-radius: 4px; flex-shrink: 0;"
+            >
+        {% endif %}
+        <div style="flex: 1;">
+            <h1 style="font-size: 2rem; color: #2c5282; margin-bottom: 1rem;">
+                {{ hymnbook.name }}
+            </h1>
+            {% if hymnbook.intro_name %}
+                <p style="font-size: 1.25rem; color: #718096; margin-bottom: 1rem;">
+                    {{ hymnbook.intro_name }}
+                </p>
+            {% endif %}
+            <p style="color: #4a5568; margin-bottom: 0.5rem;">
+                <strong>Dono:</strong> {{ hymnbook.owner_name }}
+            </p>
+            <p style="color: #4a5568; margin-bottom: 1rem;">
+                <strong>Total de Hinos:</strong> {{ hymnbook.hymn_count }}
+            </p>
+            {% if hymnbook.description %}
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 0.75rem;">Descrição</h2>
+                    <p style="color: #4a5568; line-height: 1.8; white-space: pre-line;">{{ hymnbook.description }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="font-size: 1.5rem; color: #2d3748; margin-bottom: 1rem;">Hinos</h2>
+
+    {% if hymns %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Número</th>
+                        <th>Título</th>
+                        <th style="width: 150px;">Estilo</th>
+                        <th style="width: 100px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hymn in hymns %}
+                        <tr>
+                            <td style="font-weight: 600; color: #2c5282;">{{ hymn.number }}</td>
+                            <td>
+                                <a href="{% url 'hymns:hymn_detail' hymn.pk %}" style="color: #2d3748; text-decoration: none;">
+                                    {{ hymn.title }}
+                                </a>
+                            </td>
+                            <td style="color: #718096;">
+                                {{ hymn.style|default:"—" }}
+                            </td>
+                            <td>
+                                <a href="{% url 'hymns:hymn_detail' hymn.pk %}" class="btn" style="font-size: 0.875rem; padding: 0.35rem 0.75rem;">
+                                    Ver
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="color: #718096; text-align: center; padding: 2rem;">Este hinário ainda não possui hinos cadastrados.</p>
+    {% endif %}
+</div>
+{% endblock %}
