@@ -6,7 +6,5 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    fieldsets = BaseUserAdmin.fieldsets + (
-        ("Perfil", {"fields": ("bio", "avatar")}),
-    )
+    fieldsets = BaseUserAdmin.fieldsets + (("Perfil", {"fields": ("bio", "avatar")}),)
     add_fieldsets = BaseUserAdmin.add_fieldsets

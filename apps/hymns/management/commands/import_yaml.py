@@ -21,9 +21,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("yaml_file", type=str, help="Path to the YAML file to import")
-        parser.add_argument(
-            "--update", action="store_true", help="Update existing hymn book if it already exists"
-        )
+        parser.add_argument("--update", action="store_true", help="Update existing hymn book if it already exists")
         parser.add_argument("--dry-run", action="store_true", help="Preview import without saving to database")
 
     def handle(self, *args, **options):
@@ -70,9 +68,7 @@ class Command(BaseCommand):
         hymn_numbers = [h.get("number") for h in hymns_data]
         duplicates = [num for num in set(hymn_numbers) if hymn_numbers.count(num) > 1]
         if duplicates:
-            raise CommandError(
-                f"Duplicate hymn numbers found in YAML: {', '.join(map(str, sorted(duplicates)))}"
-            )
+            raise CommandError(f"Duplicate hymn numbers found in YAML: {', '.join(map(str, sorted(duplicates)))}")
 
         self.stdout.write(self.style.SUCCESS(f"\nImporting: {name}"))
         self.stdout.write(f"Owner: {owner_name}")
@@ -94,9 +90,7 @@ class Command(BaseCommand):
                 try:
                     hymn_book = HymnBook.objects.get(name=name)
                     if not update:
-                        raise CommandError(
-                            f"Hymn book '{name}' already exists. Use --update to update it."
-                        )
+                        raise CommandError(f"Hymn book '{name}' already exists. Use --update to update it.")
                     self.stdout.write(self.style.WARNING(f"Updating existing hymn book: {name}"))
                     # Delete existing hymns
                     hymn_book.hymns.all().delete()
@@ -119,11 +113,7 @@ class Command(BaseCommand):
                         self.stdout.write(f"  Created {hymns_created}/{len(hymns_data)} hymns...")
 
                 action = "Created" if created else "Updated"
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"\n✓ {action} hymn book '{name}' with {hymns_created} hymns"
-                    )
-                )
+                self.stdout.write(self.style.SUCCESS(f"\n✓ {action} hymn book '{name}' with {hymns_created} hymns"))
 
         except Exception as e:
             raise CommandError(f"Error importing hymn book: {e}")
@@ -173,8 +163,7 @@ class Command(BaseCommand):
 
         for i, hymn_data in enumerate(hymns_data[:5]):
             self.stdout.write(
-                f"  {hymn_data.get('number')}. {hymn_data.get('title')} "
-                f"({hymn_data.get('style', 'N/A')})"
+                f"  {hymn_data.get('number')}. {hymn_data.get('title')} " f"({hymn_data.get('style', 'N/A')})"
             )
 
         if len(hymns_data) > 5:

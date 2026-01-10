@@ -350,9 +350,7 @@ class TestIndexHymn:
         mock_get_client.return_value = mock_client
 
         # Simula erro no upsert
-        mock_client.collections["hymns"].documents.upsert.side_effect = Exception(
-            "TypeSense error"
-        )
+        mock_client.collections["hymns"].documents.upsert.side_effect = Exception("TypeSense error")
 
         hymn = Mock()
         hymn.id = uuid4()
@@ -393,9 +391,7 @@ class TestDeleteHymn:
         mock_get_client.return_value = mock_client
 
         # Simula que o documento não existe
-        mock_client.collections["hymns"].documents[Mock()].delete.side_effect = Exception(
-            "Not found"
-        )
+        mock_client.collections["hymns"].documents[Mock()].delete.side_effect = Exception("Not found")
 
         hymn_id = uuid4()
 
@@ -409,9 +405,7 @@ class TestDeleteHymn:
         mock_get_client.return_value = mock_client
 
         # Simula diversos tipos de erro
-        mock_client.collections["hymns"].documents[Mock()].delete.side_effect = Exception(
-            "Connection timeout"
-        )
+        mock_client.collections["hymns"].documents[Mock()].delete.side_effect = Exception("Connection timeout")
 
         hymn_id = uuid4()
 
@@ -617,9 +611,7 @@ class TestReindexAllHymns:
     @patch("apps.hymns.models.Hymn")
     @patch("apps.search.typesense_client.index_hymn")
     @patch("apps.search.typesense_client.create_hymns_collection")
-    def test_reindex_uses_select_related(
-        self, mock_create_collection, mock_index_hymn, mock_hymn_model
-    ):
+    def test_reindex_uses_select_related(self, mock_create_collection, mock_index_hymn, mock_hymn_model):
         """Testa que usa select_related para otimizar queries."""
         mock_queryset = MagicMock()
         mock_queryset.__iter__ = Mock(return_value=iter([]))
@@ -633,9 +625,7 @@ class TestReindexAllHymns:
     @patch("apps.hymns.models.Hymn")
     @patch("apps.search.typesense_client.index_hymn")
     @patch("apps.search.typesense_client.create_hymns_collection")
-    def test_reindex_recreates_collection(
-        self, mock_create_collection, mock_index_hymn, mock_hymn_model
-    ):
+    def test_reindex_recreates_collection(self, mock_create_collection, mock_index_hymn, mock_hymn_model):
         """Testa que recria a collection antes de indexar."""
         hymns = [Mock(), Mock()]
         mock_queryset = MagicMock()

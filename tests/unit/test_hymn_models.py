@@ -50,9 +50,7 @@ class TestHymnBookModel:
     def test_hymnbook_with_owner_user(self, user_factory):
         """Test hymn book with owner user link."""
         user = user_factory(email="mestre@example.com")
-        hymn_book = HymnBook.objects.create(
-            name="O Cruzeiro", owner_name="Mestre Irineu", owner_user=user
-        )
+        hymn_book = HymnBook.objects.create(name="O Cruzeiro", owner_name="Mestre Irineu", owner_user=user)
         assert hymn_book.owner_user == user
         assert hymn_book in user.owned_hymnbooks.all()
 
@@ -296,9 +294,7 @@ class TestHymnOptionalFields:
 
         book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
         received_date = date(1930, 7, 15)
-        hymn = Hymn.objects.create(
-            hymn_book=book, number=1, title="Test", text="Text", received_at=received_date
-        )
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Test", text="Text", received_at=received_date)
         assert hymn.received_at == received_date
 
     def test_hymn_style_field(self):

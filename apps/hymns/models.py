@@ -61,9 +61,7 @@ class Hymn(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    hymn_book = models.ForeignKey(
-        HymnBook, on_delete=models.CASCADE, related_name="hymns", verbose_name="Hinário"
-    )
+    hymn_book = models.ForeignKey(HymnBook, on_delete=models.CASCADE, related_name="hymns", verbose_name="Hinário")
     number = models.PositiveIntegerField("Número", help_text="Número sequencial do hino no hinário")
     title = models.CharField("Título", max_length=255, db_index=True)
     text = models.TextField("Letra", help_text="Letra completa do hino")
@@ -71,9 +69,7 @@ class Hymn(models.Model):
     # Campos opcionais
     received_at = models.DateField("Recebido em", null=True, blank=True, help_text="Data em que o hino foi recebido")
     offered_to = models.CharField("Oferecido para", max_length=255, blank=True, help_text="Pessoa dedicatária")
-    style = models.CharField(
-        "Estilo musical", max_length=50, blank=True, help_text="Ex: Valsa, Marcha, Mazurca"
-    )
+    style = models.CharField("Estilo musical", max_length=50, blank=True, help_text="Ex: Valsa, Marcha, Mazurca")
     extra_instructions = models.TextField("Instruções extras", blank=True, help_text="Instruções especiais de canto")
     repetitions = models.CharField(
         "Repetições", max_length=100, blank=True, help_text="Ex: 1-4, 5-8 (indicação de estrofes a repetir)"
