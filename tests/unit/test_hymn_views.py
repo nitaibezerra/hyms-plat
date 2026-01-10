@@ -2,7 +2,6 @@
 Unit tests for Hymn views.
 """
 
-from datetime import date
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -239,7 +238,7 @@ class TestHymnDetailView:
 
     def test_hymn_detail_malformed_uuid_404(self, client):
         """Test that malformed UUID returns 404."""
-        url = f"/hinos/not-a-uuid/"
+        url = "/hinos/not-a-uuid/"
         response = client.get(url)
         assert response.status_code == 404
 

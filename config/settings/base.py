@@ -3,7 +3,6 @@ Django settings for hyms-plat project.
 Base settings shared across all environments.
 """
 
-import os
 from pathlib import Path
 
 import environ

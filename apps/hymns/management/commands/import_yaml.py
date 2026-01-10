@@ -38,9 +38,9 @@ class Command(BaseCommand):
             with open(yaml_file, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
         except yaml.YAMLError as e:
-            raise CommandError(f"Error parsing YAML file: {e}")
+            raise CommandError(f"Error parsing YAML file: {e}") from e
         except Exception as e:
-            raise CommandError(f"Error reading file: {e}")
+            raise CommandError(f"Error reading file: {e}") from e
 
         # Validate structure
         if "hymn_book" not in data:
@@ -58,7 +58,7 @@ class Command(BaseCommand):
             raise CommandError("hymn_book.owner is required")
 
         intro_name = hymn_book_data.get("intro_name", "").strip()
-        cover_image_path = hymn_book_data.get("cover_image_path", "")
+        # cover_image_path = hymn_book_data.get("cover_image_path", "")  # TODO: Implement cover image upload
         hymns_data = hymn_book_data.get("hymns", [])
 
         if not hymns_data:
@@ -107,7 +107,7 @@ class Command(BaseCommand):
                 # Create hymns
                 hymns_created = 0
                 for hymn_data in hymns_data:
-                    hymn = self._create_hymn(hymn_book, hymn_data)
+                    self._create_hymn(hymn_book, hymn_data)
                     hymns_created += 1
                     if hymns_created % 10 == 0:
                         self.stdout.write(f"  Created {hymns_created}/{len(hymns_data)} hymns...")
@@ -116,7 +116,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"\n✓ {action} hymn book '{name}' with {hymns_created} hymns"))
 
         except Exception as e:
-            raise CommandError(f"Error importing hymn book: {e}")
+            raise CommandError(f"Error importing hymn book: {e}") from e
 
     def _create_hymn(self, hymn_book, hymn_data):
         """Create a hymn from YAML data."""
@@ -159,9 +159,9 @@ class Command(BaseCommand):
         self.stdout.write(f"  Name: {name}")
         self.stdout.write(f"  Owner: {owner_name}")
         self.stdout.write(f"  Intro Name: {intro_name}")
-        self.stdout.write(f"\nFirst 5 hymns:")
+        self.stdout.write("\nFirst 5 hymns:")
 
-        for i, hymn_data in enumerate(hymns_data[:5]):
+        for _i, hymn_data in enumerate(hymns_data[:5]):
             self.stdout.write(
                 f"  {hymn_data.get('number')}. {hymn_data.get('title')} " f"({hymn_data.get('style', 'N/A')})"
             )

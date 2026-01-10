@@ -3,8 +3,6 @@ Pytest configuration and fixtures.
 """
 
 import io
-from datetime import date
-from pathlib import Path
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile

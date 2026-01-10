@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.generic import DetailView, ListView
 
 from apps.search.typesense_client import search_hymns
@@ -66,7 +66,7 @@ def search_view(request):
                 # Preserve TypeSense order
                 hymns_dict = {str(h.id): h for h in hymns}
                 results = [hymns_dict[hid] for hid in hymn_ids if hid in hymns_dict]
-        except Exception as e:
+        except Exception:
             # Fallback to database search if TypeSense fails
             results = (
                 Hymn.objects.filter(title__icontains=query)
