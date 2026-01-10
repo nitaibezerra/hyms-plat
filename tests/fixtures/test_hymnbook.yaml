@@ -1,0 +1,34 @@
+name: O Cruzeiro
+owner_name: Mestre Irineu
+intro_name: Cruzeiro
+description: Hinário do Mestre Irineu
+
+hymns:
+  - number: 1
+    title: Lua Branca
+    text: |
+      Lua branca
+      Da luz serena
+      Vós sois tão bela
+      Sois soberana
+    received_at: 1930-07-15
+    style: Valsa
+
+  - number: 2
+    title: Tuperci
+    text: |
+      Tuperci é um anjo
+      Que vem de lá
+      É um anjo divino
+      De Juramidã
+    style: Marcha
+
+  - number: 3
+    title: Eu Peço Licença
+    text: |
+      Eu peço licença
+      Para poder entrar
+      Nesta casa Santa
+      Morada de Juramidã
+    received_at: 1931-01-20
+    offered_to: Padrinho Sebastião

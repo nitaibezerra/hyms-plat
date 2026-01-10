@@ -1,0 +1,15 @@
+name: Test Book Duplicates
+owner_name: Test Owner
+
+hymns:
+  - number: 1
+    title: First Hymn
+    text: First text content
+
+  - number: 1
+    title: Duplicate Number
+    text: Second text with same number
+
+  - number: 2
+    title: Valid Second Hymn
+    text: This one is fine

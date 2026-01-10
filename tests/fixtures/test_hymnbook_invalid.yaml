@@ -1,0 +1,10 @@
+name: Test Book Invalid
+owner_name: Test Owner
+hymns:
+  - number: 1
+    # Missing required 'title' and 'text' fields
+    style: Valsa
+
+  - number: 2
+    title: Missing Text
+    # Missing required 'text' field

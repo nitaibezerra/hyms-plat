@@ -142,3 +142,173 @@ class TestHymnModel:
         assert Hymn.objects.count() == 2
         hymn_book.delete()
         assert Hymn.objects.count() == 0
+
+
+@pytest.mark.django_db
+class TestHymnBookSlugGeneration:
+    """Tests for HymnBook slug generation."""
+
+    def test_slug_auto_generated_on_create(self):
+        """Test that slug is automatically generated on create."""
+        book = HymnBook.objects.create(name="Hinário do Padrinho Alfredo", owner_name="Padrinho Alfredo")
+        assert book.slug == "hinario-do-padrinho-alfredo"
+
+    def test_slug_with_special_characters(self):
+        """Test slug generation with special characters."""
+        book = HymnBook.objects.create(name="O Cruzeiro - Edição Especial", owner_name="Mestre Irineu")
+        assert book.slug == "o-cruzeiro-edicao-especial"
+
+    def test_slug_with_accents(self):
+        """Test slug generation with accented characters."""
+        book = HymnBook.objects.create(name="Hinário de São José", owner_name="São José")
+        assert book.slug == "hinario-de-sao-jose"
+
+    def test_slug_preserved_on_update(self):
+        """Test that slug is preserved when updating other fields."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        original_slug = book.slug
+        book.description = "Updated description"
+        book.save()
+        assert book.slug == original_slug
+
+    def test_slug_not_regenerated_if_already_set(self):
+        """Test that existing slug is not overwritten."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner", slug="custom-slug")
+        assert book.slug == "custom-slug"
+        book.name = "New Name"
+        book.save()
+        assert book.slug == "custom-slug"
+
+
+@pytest.mark.django_db
+class TestHymnBookCoverImage:
+    """Tests for HymnBook cover image handling."""
+
+    def test_hymnbook_with_cover_image(self, sample_image):
+        """Test creating hymn book with cover image."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner", cover_image=sample_image)
+        assert book.cover_image is not None
+        assert "test_cover" in book.cover_image.name
+
+    def test_hymnbook_without_cover_image(self):
+        """Test creating hymn book without cover image."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        assert not book.cover_image
+
+    def test_hymnbook_cover_image_optional(self):
+        """Test that cover image is optional."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner", cover_image=None)
+        assert book.cover_image.name is None or book.cover_image.name == ""
+
+
+@pytest.mark.django_db
+class TestHymnBookTimestamps:
+    """Tests for HymnBook timestamp fields."""
+
+    def test_created_at_auto_set(self):
+        """Test that created_at is automatically set."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        assert book.created_at is not None
+
+    def test_updated_at_auto_set(self):
+        """Test that updated_at is automatically set."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        assert book.updated_at is not None
+
+    def test_updated_at_changes_on_save(self):
+        """Test that updated_at changes when model is saved."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        original_updated_at = book.updated_at
+        book.description = "New description"
+        book.save()
+        book.refresh_from_db()
+        assert book.updated_at > original_updated_at
+
+
+@pytest.mark.django_db
+class TestHymnBookRelationships:
+    """Tests for HymnBook relationships."""
+
+    def test_hymnbook_hymns_relationship(self):
+        """Test that hymns can be accessed from hymn book."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        Hymn.objects.create(hymn_book=book, number=1, title="Hymn 1", text="Text 1")
+        Hymn.objects.create(hymn_book=book, number=2, title="Hymn 2", text="Text 2")
+        assert book.hymns.count() == 2
+
+    def test_hymnbook_owner_user_relationship(self, user_factory):
+        """Test owner_user relationship with User model."""
+        user = user_factory(email="owner@example.com")
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner", owner_user=user)
+        assert book.owner_user == user
+        assert book in user.owned_hymnbooks.all()
+
+
+@pytest.mark.django_db
+class TestHymnEdgeCases:
+    """Tests for Hymn model edge cases."""
+
+    def test_hymn_with_empty_optional_fields(self):
+        """Test hymn with all optional fields empty."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Test", text="Test text")
+        assert hymn.received_at is None
+        assert hymn.offered_to == ""
+        assert hymn.style == ""
+        assert hymn.extra_instructions == ""
+        assert hymn.repetitions == ""
+
+    def test_hymn_with_very_long_text(self):
+        """Test hymn with very long text."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        long_text = "Lorem ipsum " * 1000
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Long Hymn", text=long_text)
+        assert len(hymn.text) > 10000
+
+    def test_hymn_with_multiline_text(self):
+        """Test hymn with multiline text."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        text = "Line 1\nLine 2\nLine 3\nLine 4"
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Multiline", text=text)
+        assert "\n" in hymn.text
+        assert hymn.text.count("\n") == 3
+
+    def test_hymn_number_can_be_zero(self):
+        """Test that hymn number can be zero."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        hymn = Hymn.objects.create(hymn_book=book, number=0, title="Zero", text="Text")
+        assert hymn.number == 0
+
+    def test_hymn_with_large_number(self):
+        """Test hymn with large number."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        hymn = Hymn.objects.create(hymn_book=book, number=9999, title="Large Number", text="Text")
+        assert hymn.number == 9999
+
+
+@pytest.mark.django_db
+class TestHymnOptionalFields:
+    """Tests for Hymn optional fields."""
+
+    def test_hymn_received_at_field(self):
+        """Test received_at field."""
+        from datetime import date
+
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        received_date = date(1930, 7, 15)
+        hymn = Hymn.objects.create(
+            hymn_book=book, number=1, title="Test", text="Text", received_at=received_date
+        )
+        assert hymn.received_at == received_date
+
+    def test_hymn_style_field(self):
+        """Test style field."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Test", text="Text", style="Valsa")
+        assert hymn.style == "Valsa"
+
+    def test_hymn_repetitions_field(self):
+        """Test repetitions field."""
+        book = HymnBook.objects.create(name="Test Book", owner_name="Test Owner")
+        hymn = Hymn.objects.create(hymn_book=book, number=1, title="Test", text="Text", repetitions="1-4, 5-8")
+        assert hymn.repetitions == "1-4, 5-8"
