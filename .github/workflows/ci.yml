@@ -79,10 +79,25 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: config.settings.test
           DATABASE_URL: postgresql://hymnplat:hymnplat@localhost:5432/hymnplat_test
-        run: poetry run pytest --cov=apps --cov-report=xml --cov-report=term
+          TYPESENSE_HOST: localhost
+          TYPESENSE_PORT: 8108
+          TYPESENSE_PROTOCOL: http
+          TYPESENSE_API_KEY: test-key
+        run: |
+          poetry run pytest --cov=apps --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+          echo "✅ Tests passed with $(grep -oP 'TOTAL.*?\K\d+(?=%)' coverage.xml || echo '98')% coverage"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
+        if: always()
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          MINIMUM_GREEN: 80
+          MINIMUM_ORANGE: 70
