@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Criar Conta - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h1 style="margin: 0 0 10px 0; color: #2c5282; font-size: 28px;">Criar Conta</h1>
+    <p style="color: #666; margin-bottom: 30px;">Junte-se à comunidade e contribua com hinários</p>
+
+    {% if form.errors %}
+    <div style="background: #fee; border-left: 4px solid #c33; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+        <p style="margin: 0; color: #c33; font-weight: bold;">Por favor, corrija os erros abaixo:</p>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_email" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                Email *
+            </label>
+            <input type="email" name="email" id="id_email"
+                   placeholder="seu@email.com"
+                   required
+                   value="{{ form.email.value|default:'' }}"
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box;">
+            {% if form.email.errors %}
+            <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_username" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                Nome de usuário
+            </label>
+            <input type="text" name="username" id="id_username"
+                   placeholder="seu_usuario"
+                   value="{{ form.username.value|default:'' }}"
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box;">
+            <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                Opcional - será gerado automaticamente a partir do email se não preenchido
+            </p>
+            {% if form.username.errors %}
+            <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.username.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_password1" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                Senha *
+            </label>
+            <input type="password" name="password1" id="id_password1"
+                   placeholder="••••••••"
+                   required
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box;">
+            <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                Mínimo 8 caracteres
+            </p>
+            {% if form.password1.errors %}
+            <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.password1.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_password2" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                Confirmar Senha *
+            </label>
+            <input type="password" name="password2" id="id_password2"
+                   placeholder="••••••••"
+                   required
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box;">
+            {% if form.password2.errors %}
+            <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.password2.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+
+        <button type="submit"
+                style="width: 100%; padding: 14px; background: #2c5282; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+            Criar Conta
+        </button>
+    </form>
+
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+        <p style="color: #666;">
+            Já tem uma conta?
+            <a href="{% url 'account_login' %}" style="color: #2c5282; text-decoration: none; font-weight: 600;">
+                Entrar
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

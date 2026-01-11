@@ -62,9 +62,9 @@ class TestHymnBookAdmin:
         assert "collapse" in HymnBookAdmin.fieldsets[2][1]["classes"]
 
     def test_inlines_configuration(self):
-        """Test that HymnInline is properly configured."""
-        assert len(HymnBookAdmin.inlines) == 1
-        assert HymnBookAdmin.inlines[0] == HymnInline
+        """Test that HymnBookVersionInline and HymnInline are properly configured."""
+        assert len(HymnBookAdmin.inlines) == 2
+        assert HymnInline in HymnBookAdmin.inlines
 
 
 @pytest.mark.django_db

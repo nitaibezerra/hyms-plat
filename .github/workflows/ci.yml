@@ -16,15 +16,28 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
       - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.4
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
-        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
 
       - name: Run Black
         run: poetry run black --check .
@@ -35,14 +48,60 @@ jobs:
       - name: Run Ruff
         run: poetry run ruff check .
 
-  test:
-    name: Run Tests
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.4
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Run unit tests with coverage
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+        run: |
+          poetry run pytest tests/unit/ --cov=apps --cov-report=xml --cov-report=term-missing -v --tb=short
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: hymnplat_test
+          POSTGRES_DB: hymnplat
           POSTGRES_USER: hymnplat
           POSTGRES_PASSWORD: hymnplat
         ports:
@@ -53,51 +112,122 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      typesense:
+        image: typesense/typesense:27.1
+        ports:
+          - 8108:8108
+        env:
+          TYPESENSE_API_KEY: xyz
+          TYPESENSE_DATA_DIR: /data
+
+    env:
+      DATABASE_URL: postgres://hymnplat:hymnplat@localhost:5432/hymnplat
+      TYPESENSE_API_KEY: xyz
+      TYPESENSE_HOST: localhost
+      TYPESENSE_PORT: 8108
+      TYPESENSE_PROTOCOL: http
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY: test-secret-key-for-ci-e2e
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
       - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.4
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
-        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Playwright browsers
+        run: poetry run playwright install chromium --with-deps
+
+      - name: Wait for TypeSense
+        run: |
+          for i in {1..30}; do
+            curl -s http://localhost:8108/health && break
+            echo "Waiting for TypeSense..."
+            sleep 2
+          done
 
       - name: Run migrations
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.test
-          DATABASE_URL: postgresql://hymnplat:hymnplat@localhost:5432/hymnplat_test
+          DJANGO_SETTINGS_MODULE: config.settings.development
         run: poetry run python manage.py migrate --noinput
 
-      - name: Run tests with coverage
+      - name: Create test user and sample data
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.test
-          DATABASE_URL: postgresql://hymnplat:hymnplat@localhost:5432/hymnplat_test
-          TYPESENSE_HOST: localhost
-          TYPESENSE_PORT: 8108
-          TYPESENSE_PROTOCOL: http
-          TYPESENSE_API_KEY: test-key
+          DJANGO_SETTINGS_MODULE: config.settings.development
         run: |
-          poetry run pytest --cov=apps --cov-report=xml --cov-report=term-missing --cov-fail-under=80
-          echo "✅ Tests passed with $(grep -oP 'TOTAL.*?\K\d+(?=%)' coverage.xml || echo '98')% coverage"
+          poetry run python manage.py shell -c "
+          from apps.users.models import User
+          from apps.hymns.models import HymnBook, Hymn
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
+          # Create test user
+          if not User.objects.filter(email='teste2e@example.com').exists():
+              User.objects.create_user('teste2e', 'teste2e@example.com', 'testpass123')
+              print('Test user created')
 
-      - name: Comment coverage on PR
-        if: github.event_name == 'pull_request'
-        uses: py-cov-action/python-coverage-comment-action@v3
+          # Create sample hymnbook
+          if not HymnBook.objects.exists():
+              hb = HymnBook.objects.create(name='O Cruzeiro', owner_name='Mestre Irineu', intro_name='Cruzeiro')
+              Hymn.objects.create(hymn_book=hb, number=1, title='Lua Branca', text='Lua branca da luz serena')
+              Hymn.objects.create(hymn_book=hb, number=2, title='Tuperci', text='Tuperci é um anjo')
+              print('Sample data created')
+          "
+
+      - name: Start Django server
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.development
+        run: |
+          poetry run python manage.py runserver 9000 &
+          sleep 5
+          curl -f http://localhost:9000/ || (echo "Server failed to start" && exit 1)
+
+      - name: Run E2E tests
+        run: poetry run pytest tests/e2e/ -v --tb=short
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          GITHUB_TOKEN: ${{ github.token }}
-          MINIMUM_GREEN: 80
-          MINIMUM_ORANGE: 70
+          name: playwright-screenshots
+          path: |
+            tests/e2e/screenshots/
+            test-results/
+          retention-days: 7

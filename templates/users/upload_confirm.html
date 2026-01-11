@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Nova Versão - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="margin: 0 0 10px 0; color: #2c5282; font-size: 28px;">Confirmar Nova Versão</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            Você está adicionando uma nova versão de um hinário existente
+        </p>
+
+        {% if error %}
+        <div style="background: #fee; border-left: 4px solid #c33; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+            <p style="margin: 0; color: #c33; font-weight: bold;">{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <div style="background: #f7fafc; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+            <div style="margin-bottom: 20px;">
+                <div class="metadata-label" style="margin-bottom: 5px;">Hinário Existente</div>
+                <h2 style="color: #2c5282; margin: 0; font-size: 22px;">
+                    <a href="{% url 'hymns:hymnbook_detail' hymnbook.slug %}" target="_blank" style="color: #2c5282; text-decoration: none;">
+                        {{ hymnbook.name }}
+                    </a>
+                </h2>
+                <p style="color: #666; margin: 5px 0 0 0;">
+                    {{ hymnbook.owner_name }} | {{ hymnbook.hymn_count }} hinos
+                </p>
+            </div>
+
+            <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
+                <div class="metadata-label" style="margin-bottom: 5px;">Nova Versão</div>
+                <p style="color: #2c5282; margin: 0; font-size: 18px; font-weight: 600;">
+                    {{ version_info.version_name }}
+                </p>
+                <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">
+                    Arquivo: {{ upload_data.yaml_filename }} ({{ upload_data.hymns_count }} hinos)
+                </p>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="background: #e6f2ff; border-left: 4px solid #2c5282; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #2c5282;">
+                    Esta versão será adicionada ao hinário <strong>{{ hymnbook.name }}</strong> e ficará disponível para os usuários.
+                    O arquivo YAML será salvo para referência futura.
+                </p>
+            </div>
+
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #856404; font-size: 14px;">
+                    <strong>Nota:</strong> A nova versão não será marcada como primária automaticamente.
+                    Você pode alterá-la para primária posteriormente no admin Django.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn" style="flex: 1;">
+                    Confirmar e Criar Versão
+                </button>
+                <a href="{% url 'users:upload' %}" class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

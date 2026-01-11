@@ -15,6 +15,8 @@ urlpatterns = [
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("accounts/", include("allauth.urls")),
+    # Users app URLs
+    path("", include("apps.users.urls")),
     # Hymns app URLs (before Wagtail catch-all)
     path("", include("apps.hymns.urls")),
     # Wagtail handles remaining URLs

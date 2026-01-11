@@ -1,0 +1,119 @@
+{% comment %}
+Audio player component for hymns
+Usage: {% include 'hymns/_audio_player.html' with audio=hymn_audio %}
+{% endcomment %}
+
+{% if audio and audio.is_approved %}
+<div class="audio-player" style="
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <div style="font-size: 32px;">🎵</div>
+        <div style="flex: 1;">
+            <h3 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600;">
+                {{ audio.title|default:"Áudio do Hino" }}
+            </h3>
+            {% if audio.source %}
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">
+                Fonte: {{ audio.source }}
+            </p>
+            {% endif %}
+        </div>
+        {% if audio.allow_download %}
+        <a href="{% url 'hymns:download_audio' audio_id=audio.id %}"
+           class="btn btn-secondary"
+           style="background: rgba(255, 255, 255, 0.2); padding: 8px 16px; font-size: 14px;"
+           download>
+            📥 Download
+        </a>
+        {% endif %}
+    </div>
+
+    <audio id="hymn-audio-player" controls style="
+        width: 100%;
+        height: 40px;
+        border-radius: 8px;
+        filter: brightness(0.95);
+    ">
+        <source src="{{ audio.audio_file.url }}" type="audio/{{ audio.format|lower }}">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    {% if audio.credits or audio.recorded_at %}
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 13px; opacity: 0.9;">
+        {% if audio.recorded_at %}
+        <div style="margin-bottom: 5px;">
+            📅 Gravado em: {{ audio.recorded_at|date:"d/m/Y" }}
+        </div>
+        {% endif %}
+        {% if audio.credits %}
+        <div>
+            🎤 Créditos: {{ audio.credits }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Audio player enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    const player = document.getElementById('hymn-audio-player');
+
+    if (player) {
+        // Remember playback position
+        const hymnId = '{{ hymn.id }}';
+        const storageKey = `audio_position_${hymnId}`;
+
+        // Restore position
+        const savedPosition = localStorage.getItem(storageKey);
+        if (savedPosition) {
+            player.currentTime = parseFloat(savedPosition);
+        }
+
+        // Save position periodically
+        player.addEventListener('timeupdate', function() {
+            if (!player.paused && !player.ended) {
+                localStorage.setItem(storageKey, player.currentTime);
+            }
+        });
+
+        // Clear position when audio ends
+        player.addEventListener('ended', function() {
+            localStorage.removeItem(storageKey);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Space to play/pause (only if not in input)
+            if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+                e.preventDefault();
+                if (player.paused) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            }
+
+            // Left arrow to rewind 5s
+            if (e.code === 'ArrowLeft' && e.ctrlKey) {
+                e.preventDefault();
+                player.currentTime = Math.max(0, player.currentTime - 5);
+            }
+
+            // Right arrow to forward 5s
+            if (e.code === 'ArrowRight' && e.ctrlKey) {
+                e.preventDefault();
+                player.currentTime = Math.min(player.duration, player.currentTime + 5);
+            }
+        });
+    }
+});
+</script>
+
+{% endif %}

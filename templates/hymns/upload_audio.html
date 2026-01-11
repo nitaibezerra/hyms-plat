@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Upload de Áudio - {{ hymn.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="margin: 0 0 10px 0; color: #2c5282; font-size: 24px;">Upload de Áudio</h1>
+
+        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #666;">
+                <strong>{{ hymn.hymn_book.name }}</strong> - Hino {{ hymn.number }}
+            </p>
+            <p style="margin: 5px 0 0 0; color: #2c5282; font-size: 18px; font-weight: 500;">
+                {{ hymn.title }}
+            </p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.audio_file.id_for_label }}" style="display: block; margin-bottom: 8px; color: #2c5282; font-weight: 500;">
+                    Arquivo de Áudio *
+                </label>
+                {{ form.audio_file }}
+                {% if form.audio_file.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.audio_file.errors.0 }}</p>
+                {% endif %}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    Formatos aceitos: MP3, OGG, FLAC (máx. 25MB)
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.title.id_for_label }}" style="display: block; margin-bottom: 8px; color: #2c5282; font-weight: 500;">
+                    Título da Gravação
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.title.errors.0 }}</p>
+                {% endif %}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    Ex: "Gravação do hinário 2023", "Ao vivo - Trabalho de São João"
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.source.id_for_label }}" style="display: block; margin-bottom: 8px; color: #2c5282; font-weight: 500;">
+                    Fonte
+                </label>
+                {{ form.source }}
+                {% if form.source.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.source.errors.0 }}</p>
+                {% endif %}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    Onde foi gravado ou origem do arquivo
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.recorded_at.id_for_label }}" style="display: block; margin-bottom: 8px; color: #2c5282; font-weight: 500;">
+                    Data da Gravação
+                </label>
+                {{ form.recorded_at }}
+                {% if form.recorded_at.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.recorded_at.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.credits.id_for_label }}" style="display: block; margin-bottom: 8px; color: #2c5282; font-weight: 500;">
+                    Créditos
+                </label>
+                {{ form.credits }}
+                {% if form.credits.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.credits.errors.0 }}</p>
+                {% endif %}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    Quem cantou, gravou, produziu, etc.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    {{ form.allow_download }}
+                    <span style="margin-left: 8px; color: #2c5282;">
+                        Permitir download deste áudio
+                    </span>
+                </label>
+                {% if form.allow_download.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.allow_download.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #92400e; font-size: 14px;">
+                    <strong>⚠️ Aviso:</strong> Seu áudio será revisado antes de ser publicado.
+                    Certifique-se de ter os direitos para compartilhar este arquivo.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn" style="flex: 1;">
+                    Enviar Áudio
+                </button>
+                <a href="{% url 'hymns:hymn_detail' pk=hymn.id %}" class="btn btn-secondary" style="flex: 1; text-align: center; line-height: 2.5;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

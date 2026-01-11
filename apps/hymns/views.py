@@ -44,6 +44,24 @@ class HymnDetailView(DetailView):
     def get_queryset(self):
         return Hymn.objects.select_related("hymn_book")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hymn = self.object
+
+        # Check if favorited by current user
+        if self.request.user.is_authenticated:
+            from .models import Favorite
+
+            context["is_favorited"] = Favorite.objects.filter(user=self.request.user, hymn=hymn).exists()
+
+        # Get approved audios
+        context["audios"] = hymn.audios.filter(is_approved=True).order_by("-created_at")
+
+        # Get approved comments
+        context["comments"] = hymn.comments.filter(is_approved=True, is_flagged=False).order_by("created_at")
+
+        return context
+
 
 def search_view(request):
     """Search hymns using TypeSense."""

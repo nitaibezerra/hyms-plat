@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -223,6 +224,31 @@
                     <li><a href="{% url 'hymns:home' %}">Início</a></li>
                     <li><a href="{% url 'hymns:hymnbook_list' %}">Hinários</a></li>
                     <li><a href="{% url 'hymns:search' %}">Buscar</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'users:profile' user.username %}">Perfil</a></li>
+                        <li><a href="{% url 'users:upload' %}">Contribuir</a></li>
+                        <li style="position: relative;">
+                            <a href="{% url 'users:notifications' %}">
+                                Notificações
+                                <span id="notification-count" style="
+                                    display: none;
+                                    position: absolute;
+                                    top: -8px;
+                                    right: -8px;
+                                    background: #f56565;
+                                    color: white;
+                                    border-radius: 50%;
+                                    padding: 2px 6px;
+                                    font-size: 11px;
+                                    font-weight: 700;
+                                "></span>
+                            </a>
+                        </li>
+                        <li><a href="{% url 'account_logout' %}">Sair</a></li>
+                    {% else %}
+                        <li><a href="{% url 'account_login' %}">Entrar</a></li>
+                        <li><a href="{% url 'account_signup' %}" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 4px;">Criar Conta</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
@@ -240,6 +266,7 @@
         </div>
     </footer>
 
+    <script src="{% static 'js/social.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

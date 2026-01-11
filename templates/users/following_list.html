@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Seguindo - {{ profile_user.username }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card">
+        <div style="margin-bottom: 20px;">
+            <h1 style="margin: 0 0 5px 0; color: #2c5282; font-size: 28px;">Seguindo</h1>
+            <p style="margin: 0; color: #718096;">
+                Usuários que
+                {% if profile_user == request.user %}
+                    você segue
+                {% else %}
+                    <a href="{% url 'users:profile' username=profile_user.username %}" style="color: #3182ce; text-decoration: none;">
+                        {{ profile_user.username }}
+                    </a>
+                    segue
+                {% endif %}
+            </p>
+        </div>
+
+        {% if following %}
+            <div style="display: grid; gap: 15px;">
+                {% for follow in following %}
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 15px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    background: #f7fafc;
+                ">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        {% if follow.followed.avatar %}
+                        <img src="{{ follow.followed.avatar.url }}"
+                             alt="{{ follow.followed.username }}"
+                             style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        <div style="
+                            width: 48px;
+                            height: 48px;
+                            border-radius: 50%;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: 600;
+                            font-size: 20px;
+                        ">
+                            {{ follow.followed.username|first|upper }}
+                        </div>
+                        {% endif %}
+
+                        <div>
+                            <h3 style="margin: 0 0 3px 0; color: #2d3748; font-size: 16px; font-weight: 600;">
+                                <a href="{% url 'users:profile' username=follow.followed.username %}"
+                                   style="color: #2c5282; text-decoration: none;">
+                                    {{ follow.followed.username }}
+                                </a>
+                            </h3>
+                            {% if follow.followed.bio %}
+                            <p style="margin: 0; color: #718096; font-size: 14px;">
+                                {{ follow.followed.bio|truncatewords:15 }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{% url 'users:profile' username=follow.followed.username %}"
+                           class="btn btn-secondary">
+                            Ver Perfil
+                        </a>
+
+                        {% if request.user == profile_user %}
+                        <form method="post" action="{% url 'users:toggle_follow' username=follow.followed.username %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary">
+                                Deixar de Seguir
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if following|length == 100 %}
+            <p style="text-align: center; color: #718096; font-size: 14px; margin-top: 20px;">
+                Mostrando os primeiros 100 usuários
+            </p>
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                <h2 style="margin: 0 0 10px 0; color: #4a5568; font-size: 20px;">
+                    Nenhum usuário sendo seguido
+                </h2>
+                <p style="margin: 0; color: #718096;">
+                    {% if profile_user == request.user %}
+                        Comece a seguir outros usuários para ver suas atualizações!
+                    {% else %}
+                        Este usuário ainda não segue ninguém.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

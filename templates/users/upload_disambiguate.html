@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Hinário Similar Encontrado - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="margin: 0 0 10px 0; color: #2c5282; font-size: 28px;">Hinário Similar Encontrado</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            Encontramos hinário(s) similar(es) ao que você está enviando. O que deseja fazer?
+        </p>
+
+        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin-bottom: 30px; border-radius: 4px;">
+            <p style="margin: 0 0 10px 0; color: #856404; font-weight: 600;">
+                Hinário que você está enviando:
+            </p>
+            <p style="margin: 0; color: #856404; font-size: 18px; font-weight: 500;">
+                {{ upload_data.name }} ({{ upload_data.hymns_count }} hinos)
+            </p>
+        </div>
+
+        {% if exact_match %}
+        <div style="background: #fee; border-left: 4px solid #c33; padding: 20px; margin-bottom: 25px; border-radius: 4px;">
+            <p style="margin: 0 0 10px 0; color: #c33; font-weight: 600;">
+                ⚠️ Match Exato Encontrado
+            </p>
+            <p style="margin: 0; color: #721c24;">
+                Já existe um hinário com o nome <strong>{{ exact_match.name }}</strong> no sistema.
+            </p>
+        </div>
+        {% endif %}
+
+        <h3 style="color: #2c5282; margin: 30px 0 15px 0; font-size: 18px;">
+            Hinários Similares
+        </h3>
+
+        <div style="display: grid; gap: 15px; margin-bottom: 30px;">
+            {% for item in similar_hymnbooks %}
+            <div class="card" style="background: #f7fafc; padding: 15px; margin: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 5px 0; color: #2c5282;">
+                            <a href="{% url 'hymns:hymnbook_detail' item.hymnbook.slug %}" target="_blank" style="color: #2c5282; text-decoration: none;">
+                                {{ item.hymnbook.name }}
+                            </a>
+                        </h4>
+                        <p style="color: #666; margin: 0; font-size: 14px;">
+                            Dono: {{ item.hymnbook.owner_name }} | {{ item.hymnbook.hymn_count }} hinos
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="background: #2c5282; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; margin-bottom: 5px;">
+                            Nome: {{ item.name_score }}%
+                        </div>
+                        <div style="background: #4a5568; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;">
+                            Conteúdo: {{ item.content_score }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: #666; text-align: center;">Nenhum hinário similar encontrado.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <h3 style="color: #2c5282; margin: 30px 0 15px 0; font-size: 18px;">
+                Escolha uma ação
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+                <label style="display: block; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="choice" value="create_new" checked style="margin-right: 10px;">
+                    <strong style="color: #2c5282;">Criar novo hinário</strong>
+                    <p style="color: #666; margin: 5px 0 0 28px; font-size: 14px;">
+                        São hinários diferentes. Criar como um novo hinário separado.
+                    </p>
+                </label>
+
+                {% if similar_hymnbooks %}
+                <label style="display: block; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="choice" value="add_version" style="margin-right: 10px;">
+                    <strong style="color: #2c5282;">Adicionar como nova versão</strong>
+                    <p style="color: #666; margin: 5px 0 10px 28px; font-size: 14px;">
+                        É o mesmo hinário, mas uma versão diferente.
+                    </p>
+                    <div style="margin-left: 28px;">
+                        <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">
+                            Selecione o hinário:
+                        </label>
+                        <select name="selected_hymnbook" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">-- Escolha um hinário --</option>
+                            {% for item in similar_hymnbooks %}
+                            <option value="{{ item.hymnbook.id }}">{{ item.hymnbook.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <label style="display: block; margin: 10px 0 5px 0; color: #555; font-size: 14px;">
+                            Nome da versão:
+                        </label>
+                        <input type="text" name="version_name" placeholder="Ex: Edição 2020" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    </div>
+                </label>
+                {% endif %}
+
+                <label style="display: block; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="choice" value="cancel" style="margin-right: 10px;">
+                    <strong style="color: #c33;">Cancelar upload</strong>
+                    <p style="color: #666; margin: 5px 0 0 28px; font-size: 14px;">
+                        Não fazer upload neste momento.
+                    </p>
+                </label>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; padding: 14px;">
+                Continuar
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    label:has(input[type="radio"]:checked) {
+        border-color: #2c5282 !important;
+        background: #e6f2ff !important;
+    }
+</style>
+{% endblock %}
