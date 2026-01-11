@@ -77,9 +77,7 @@ class TestHymnBookVersionForm:
 
     def test_valid_version_form(self):
         """Test form with valid data."""
-        form = HymnBookVersionForm(
-            data={"version_name": "Versão 2023", "description": "Test description"}
-        )
+        form = HymnBookVersionForm(data={"version_name": "Versão 2023", "description": "Test description"})
 
         assert form.is_valid()
 

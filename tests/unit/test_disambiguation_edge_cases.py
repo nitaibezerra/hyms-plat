@@ -3,6 +3,7 @@ Additional edge case tests for disambiguation to boost coverage.
 """
 
 import pytest
+
 from apps.hymns.disambiguation import find_duplicates_with_content, normalize_hymnbook_name
 from apps.hymns.models import Hymn, HymnBook
 
@@ -64,9 +65,7 @@ class TestDisambiguationEdgeCases:
         result = find_duplicates_with_content(name="Hinário Cruzeiro", hymns=[], name_threshold=0.6)
 
         # Should return all matches
-        total = (
-            len(result["high_confidence"]) + len(result["medium_confidence"]) + len(result["low_confidence"])
-        )
+        total = len(result["high_confidence"]) + len(result["medium_confidence"]) + len(result["low_confidence"])
         assert total > 0
 
     def test_find_duplicates_with_very_long_name(self):
@@ -92,9 +91,7 @@ class TestDisambiguationEdgeCases:
         )
 
         # Should have some matches (high, medium, or low)
-        total = (
-            len(result["high_confidence"]) + len(result["medium_confidence"]) + len(result["low_confidence"])
-        )
+        total = len(result["high_confidence"]) + len(result["medium_confidence"]) + len(result["low_confidence"])
         assert total >= 0  # At least should not crash
 
     def test_find_duplicates_with_None_hymns(self):

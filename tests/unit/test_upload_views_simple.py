@@ -14,9 +14,7 @@ User = get_user_model()
 @pytest.fixture
 def user(django_user_model):
     """Create test user."""
-    return django_user_model.objects.create_user(
-        username="uploader", email="uploader@example.com", password="pass123"
-    )
+    return django_user_model.objects.create_user(username="uploader", email="uploader@example.com", password="pass123")
 
 
 @pytest.mark.django_db

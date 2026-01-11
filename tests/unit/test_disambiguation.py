@@ -184,9 +184,7 @@ class TestFindDuplicatesWithContent:
         """Test detection of exact match."""
         HymnBook.objects.create(name="O Cruzeiro", owner_name="Mestre Irineu")
 
-        result = find_duplicates_with_content(
-            name="O Cruzeiro", hymns=[], name_threshold=0.7, content_threshold=0.8
-        )
+        result = find_duplicates_with_content(name="O Cruzeiro", hymns=[], name_threshold=0.7, content_threshold=0.8)
 
         assert result["exact_match"] is not None
         assert result["exact_match"].name == "O Cruzeiro"
@@ -196,16 +194,12 @@ class TestFindDuplicatesWithContent:
         hb = HymnBook.objects.create(name="O Cruzeiro", owner_name="Mestre Irineu")
 
         # Cria hinos
-        Hymn.objects.create(
-            hymn_book=hb, number=1, title="Lua Branca", text="Da luz serena\nDo mar sagrado"
-        )
+        Hymn.objects.create(hymn_book=hb, number=1, title="Lua Branca", text="Da luz serena\nDo mar sagrado")
 
         # Tenta upload com nome similar e mesmo conteúdo
         hymns = [{"number": 1, "title": "Lua Branca", "text": "Da luz serena\nDo mar sagrado"}]
 
-        result = find_duplicates_with_content(
-            name="Cruzeiro", hymns=hymns, name_threshold=0.7, content_threshold=0.8
-        )
+        result = find_duplicates_with_content(name="Cruzeiro", hymns=hymns, name_threshold=0.7, content_threshold=0.8)
 
         # Deve detectar duplicata (pode ser high, medium ou low confidence)
         total_duplicates = (
@@ -231,9 +225,7 @@ class TestFindDuplicatesWithContent:
         """Test medium confidence detection."""
         hb = HymnBook.objects.create(name="O Cruzeiro", owner_name="Mestre Irineu")
 
-        Hymn.objects.create(
-            hymn_book=hb, number=1, title="Lua Branca", text="Da luz serena do mar"
-        )
+        Hymn.objects.create(hymn_book=hb, number=1, title="Lua Branca", text="Da luz serena do mar")
 
         # Nome similar, mas texto diferente
         hymns = [{"number": 1, "title": "Outro Hino", "text": "Texto diferente completamente"}]

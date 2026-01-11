@@ -187,12 +187,12 @@ jobs:
 
       - name: Run migrations
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.development
+          DJANGO_SETTINGS_MODULE: config.settings.local
         run: poetry run python manage.py migrate --noinput
 
       - name: Create test user and sample data
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.development
+          DJANGO_SETTINGS_MODULE: config.settings.local
         run: |
           poetry run python manage.py shell -c "
           from apps.users.models import User
@@ -213,7 +213,7 @@ jobs:
 
       - name: Start Django server
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.development
+          DJANGO_SETTINGS_MODULE: config.settings.local
         run: |
           poetry run python manage.py runserver 9000 &
           sleep 5

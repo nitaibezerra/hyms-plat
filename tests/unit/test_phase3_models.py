@@ -185,7 +185,10 @@ class TestNotificationModel:
         user1 = User.objects.create_user(username="user1", email="user1@example.com", password="pass123")
 
         notification = Notification.objects.create(
-            recipient=user1, notification_type=Notification.TYPE_COMMENT, title="New comment", message="Someone commented"
+            recipient=user1,
+            notification_type=Notification.TYPE_COMMENT,
+            title="New comment",
+            message="Someone commented",
         )
 
         assert "user1" in str(notification)

@@ -35,25 +35,19 @@ class TestHymnBookVersionModel:
 
     def test_version_string_representation(self, hymn_book):
         """Test __str__ method."""
-        version = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Edição 2020"
-        )
+        version = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Edição 2020")
 
         assert str(version) == f"{hymn_book.name} - Edição 2020"
 
     def test_is_primary_removes_other_primaries(self, hymn_book):
         """Test that setting is_primary=True removes flag from other versions."""
         # Cria primeira versão primária
-        version1 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Versão 1", is_primary=True
-        )
+        version1 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Versão 1", is_primary=True)
 
         assert version1.is_primary is True
 
         # Cria segunda versão primária
-        version2 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Versão 2", is_primary=True
-        )
+        version2 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Versão 2", is_primary=True)
 
         # Recarrega primeira versão
         version1.refresh_from_db()
@@ -63,13 +57,9 @@ class TestHymnBookVersionModel:
 
     def test_multiple_non_primary_versions(self, hymn_book):
         """Test creating multiple non-primary versions."""
-        version1 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Versão 1", is_primary=False
-        )
+        version1 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Versão 1", is_primary=False)
 
-        version2 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Versão 2", is_primary=False
-        )
+        version2 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Versão 2", is_primary=False)
 
         assert version1.is_primary is False
         assert version2.is_primary is False
@@ -91,17 +81,11 @@ class TestHymnBookVersionModel:
 
     def test_version_ordering(self, hymn_book):
         """Test that versions are ordered by is_primary desc, then created_at desc."""
-        version1 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Antiga", is_primary=False
-        )
+        version1 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Antiga", is_primary=False)
 
-        version2 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Primária", is_primary=True
-        )
+        version2 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Primária", is_primary=True)
 
-        version3 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Recente", is_primary=False
-        )
+        version3 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Recente", is_primary=False)
 
         versions = list(HymnBookVersion.objects.filter(hymn_book=hymn_book))
 
@@ -121,9 +105,7 @@ class TestHymnBookVersionModel:
 
     def test_version_without_uploaded_by(self, hymn_book):
         """Test creating version without uploaded_by (nullable)."""
-        version = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Sem Usuário", uploaded_by=None
-        )
+        version = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Sem Usuário", uploaded_by=None)
 
         assert version.uploaded_by is None
 
@@ -155,13 +137,9 @@ class TestHymnBookVersionRelationships:
             username="uploader", email="uploader@example.com", password="pass123"
         )
 
-        version1 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="V1", uploaded_by=user
-        )
+        version1 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="V1", uploaded_by=user)
 
-        version2 = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="V2", uploaded_by=user
-        )
+        version2 = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="V2", uploaded_by=user)
 
         uploaded = user.uploaded_versions.all()
 
@@ -171,13 +149,9 @@ class TestHymnBookVersionRelationships:
 
     def test_set_null_on_user_delete(self, hymn_book, django_user_model):
         """Test that uploaded_by is set to null when user is deleted."""
-        user = django_user_model.objects.create_user(
-            username="temp", email="temp@example.com", password="pass123"
-        )
+        user = django_user_model.objects.create_user(username="temp", email="temp@example.com", password="pass123")
 
-        version = HymnBookVersion.objects.create(
-            hymn_book=hymn_book, version_name="Test", uploaded_by=user
-        )
+        version = HymnBookVersion.objects.create(hymn_book=hymn_book, version_name="Test", uploaded_by=user)
 
         user.delete()
         version.refresh_from_db()

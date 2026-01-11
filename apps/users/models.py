@@ -26,12 +26,8 @@ class UserFollow(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    follower = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="following", verbose_name="Seguidor"
-    )
-    followed = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="followers", verbose_name="Seguido"
-    )
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following", verbose_name="Seguidor")
+    followed = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers", verbose_name="Seguido")
 
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
 
@@ -81,16 +77,12 @@ class Notification(models.Model):
         verbose_name="Remetente",
     )
 
-    notification_type = models.CharField(
-        "Tipo", max_length=20, choices=NOTIFICATION_TYPES, default=TYPE_COMMENT
-    )
+    notification_type = models.CharField("Tipo", max_length=20, choices=NOTIFICATION_TYPES, default=TYPE_COMMENT)
 
     # Conteúdo
     title = models.CharField("Título", max_length=255)
     message = models.TextField("Mensagem", max_length=500)
-    link = models.CharField(
-        "Link", max_length=500, blank=True, help_text="URL para onde a notificação leva"
-    )
+    link = models.CharField("Link", max_length=500, blank=True, help_text="URL para onde a notificação leva")
 
     # Estado
     is_read = models.BooleanField("Lida", default=False)

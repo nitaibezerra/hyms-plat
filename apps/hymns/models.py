@@ -104,12 +104,8 @@ class HymnBookVersion(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    hymn_book = models.ForeignKey(
-        HymnBook, on_delete=models.CASCADE, related_name="versions", verbose_name="Hinário"
-    )
-    version_name = models.CharField(
-        "Nome da versão", max_length=100, help_text="Ex: Edição 2010, Versão revisada"
-    )
+    hymn_book = models.ForeignKey(HymnBook, on_delete=models.CASCADE, related_name="versions", verbose_name="Hinário")
+    version_name = models.CharField("Nome da versão", max_length=100, help_text="Ex: Edição 2010, Versão revisada")
     description = models.TextField("Descrição", blank=True, help_text="Diferenças desta versão")
 
     # Arquivos
@@ -161,9 +157,7 @@ class HymnAudio(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Relacionamento
-    hymn = models.ForeignKey(
-        Hymn, on_delete=models.CASCADE, related_name="audios", verbose_name="Hino"
-    )
+    hymn = models.ForeignKey(Hymn, on_delete=models.CASCADE, related_name="audios", verbose_name="Hino")
 
     # Arquivo de áudio
     audio_file = models.FileField(
@@ -173,29 +167,17 @@ class HymnAudio(models.Model):
     )
 
     # Metadados
-    title = models.CharField(
-        "Título da gravação", max_length=200, blank=True, help_text="Ex: Gravação Studio 2023"
-    )
-    source = models.CharField(
-        "Fonte", max_length=255, blank=True, help_text="Onde foi gravado"
-    )
-    recorded_at = models.DateField(
-        "Data de gravação", null=True, blank=True, help_text="Quando foi gravado"
-    )
-    credits = models.TextField(
-        "Créditos", blank=True, help_text="Quem cantou, gravou, produziu, etc."
-    )
+    title = models.CharField("Título da gravação", max_length=200, blank=True, help_text="Ex: Gravação Studio 2023")
+    source = models.CharField("Fonte", max_length=255, blank=True, help_text="Onde foi gravado")
+    recorded_at = models.DateField("Data de gravação", null=True, blank=True, help_text="Quando foi gravado")
+    credits = models.TextField("Créditos", blank=True, help_text="Quem cantou, gravou, produziu, etc.")
 
     # Informações técnicas
-    duration = models.PositiveIntegerField(
-        "Duração (segundos)", null=True, blank=True, help_text="Duração em segundos"
-    )
+    duration = models.PositiveIntegerField("Duração (segundos)", null=True, blank=True, help_text="Duração em segundos")
     file_size = models.PositiveIntegerField(
         "Tamanho (bytes)", null=True, blank=True, help_text="Tamanho do arquivo em bytes"
     )
-    format = models.CharField(
-        "Formato", max_length=10, blank=True, help_text="MP3, OGG, FLAC, etc."
-    )
+    format = models.CharField("Formato", max_length=10, blank=True, help_text="MP3, OGG, FLAC, etc.")
 
     # Controle
     uploaded_by = models.ForeignKey(
@@ -207,9 +189,7 @@ class HymnAudio(models.Model):
         verbose_name="Enviado por",
     )
     is_approved = models.BooleanField("Aprovado", default=False, help_text="Moderação")
-    allow_download = models.BooleanField(
-        "Permitir download", default=True, help_text="Usuários podem baixar o arquivo"
-    )
+    allow_download = models.BooleanField("Permitir download", default=True, help_text="Usuários podem baixar o arquivo")
 
     # Timestamps
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
@@ -234,12 +214,8 @@ class Favorite(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    user = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="favorites", verbose_name="Usuário"
-    )
-    hymn = models.ForeignKey(
-        Hymn, on_delete=models.CASCADE, related_name="favorited_by", verbose_name="Hino"
-    )
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="favorites", verbose_name="Usuário")
+    hymn = models.ForeignKey(Hymn, on_delete=models.CASCADE, related_name="favorited_by", verbose_name="Hino")
 
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
 
@@ -262,20 +238,14 @@ class Comment(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    hymn = models.ForeignKey(
-        Hymn, on_delete=models.CASCADE, related_name="comments", verbose_name="Hino"
-    )
-    user = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="comments", verbose_name="Usuário"
-    )
+    hymn = models.ForeignKey(Hymn, on_delete=models.CASCADE, related_name="comments", verbose_name="Hino")
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="comments", verbose_name="Usuário")
 
     text = models.TextField("Comentário", max_length=1000)
 
     # Moderação
     is_approved = models.BooleanField("Aprovado", default=True, help_text="Pode ser moderado")
-    is_flagged = models.BooleanField(
-        "Reportado", default=False, help_text="Reportado por abuso"
-    )
+    is_flagged = models.BooleanField("Reportado", default=False, help_text="Reportado por abuso")
 
     # Timestamps
     created_at = models.DateTimeField("Criado em", auto_now_add=True)

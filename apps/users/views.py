@@ -151,9 +151,7 @@ def upload_view(request):
                 # Se encontrou match exato ou alta confiança, mostra página de desambiguação
                 if duplicates["exact_match"] or duplicates["high_confidence"]:
                     request.session["duplicates"] = {
-                        "exact_match": str(duplicates["exact_match"].id)
-                        if duplicates["exact_match"]
-                        else None,
+                        "exact_match": str(duplicates["exact_match"].id) if duplicates["exact_match"] else None,
                         "high_confidence": [
                             (str(hb.id), name_score, content_score)
                             for hb, name_score, content_score in duplicates["high_confidence"]
@@ -356,9 +354,7 @@ def upload_confirm_view(request):
             # Salva YAML content em arquivo temporário
             yaml_content = upload_data["yaml_content"]
 
-            with tempfile.NamedTemporaryFile(
-                mode="w", delete=False, suffix=".yaml", encoding="utf-8"
-            ) as tmp_file:
+            with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yaml", encoding="utf-8") as tmp_file:
                 # Reconstrói YAML de string
                 import ast
 

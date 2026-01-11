@@ -21,6 +21,10 @@ urlpatterns = [
     path("perfil/<str:username>/seguindo/", views_social.following_list, name="following_list"),
     path("perfil/<str:username>/seguidores/", views_social.followers_list, name="followers_list"),
     path("notificacoes/", views_social.notifications_list, name="notifications"),
-    path("notificacoes/<uuid:notification_id>/marcar-lida/", views_social.mark_notification_read, name="mark_notification_read"),
+    path(
+        "notificacoes/<uuid:notification_id>/marcar-lida/",
+        views_social.mark_notification_read,
+        name="mark_notification_read",
+    ),
     path("notificacoes/nao-lidas/", views_social.unread_notifications_count, name="unread_notifications_count"),
 ]

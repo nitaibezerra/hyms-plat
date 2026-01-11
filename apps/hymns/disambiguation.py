@@ -61,9 +61,7 @@ def find_exact_match(name: str) -> HymnBook | None:
     return None
 
 
-def find_similar_hymnbooks(
-    name: str, threshold: float = 0.7, limit: int = 5
-) -> List[Tuple[HymnBook, float]]:
+def find_similar_hymnbooks(name: str, threshold: float = 0.7, limit: int = 5) -> List[Tuple[HymnBook, float]]:
     """
     Busca hinários similares usando fuzzy matching no nome.
 

@@ -13,9 +13,7 @@ from playwright.sync_api import Page, expect
 class TestSocialFeatures:
     """Tests for social features."""
 
-    def test_hymn_detail_shows_social_buttons_when_authenticated(
-        self, authenticated_page: Page, base_url: str
-    ):
+    def test_hymn_detail_shows_social_buttons_when_authenticated(self, authenticated_page: Page, base_url: str):
         """Social buttons are visible on hymn detail when authenticated."""
         # First get a hymn ID from the hymnbook list
         authenticated_page.goto(f"{base_url}/hinarios/")
@@ -28,9 +26,7 @@ class TestSocialFeatures:
             authenticated_page.wait_for_load_state("networkidle")
 
             # Favorite button should be visible
-            fav_button = authenticated_page.locator(
-                '[data-action="toggle-favorite"], button:has-text("Favorit")'
-            )
+            fav_button = authenticated_page.locator('[data-action="toggle-favorite"], button:has-text("Favorit")')
             expect(fav_button).to_be_visible()
 
             # Comment link should be visible

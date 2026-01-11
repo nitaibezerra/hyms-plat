@@ -149,14 +149,10 @@ class DisambiguationChoiceForm(forms.Form):
             version_name = cleaned_data.get("version_name")
 
             if not selected_hymnbook:
-                raise forms.ValidationError(
-                    "Você deve selecionar um hinário para adicionar a versão"
-                )
+                raise forms.ValidationError("Você deve selecionar um hinário para adicionar a versão")
 
             if not version_name:
-                raise forms.ValidationError(
-                    "Você deve fornecer um nome para a versão"
-                )
+                raise forms.ValidationError("Você deve fornecer um nome para a versão")
 
         return cleaned_data
 

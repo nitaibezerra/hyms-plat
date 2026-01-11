@@ -27,9 +27,7 @@ class TestProfileView:
 
     def test_profile_shows_hymnbooks(self, client, django_user_model):
         """Test that profile shows user's hymnbooks."""
-        user = django_user_model.objects.create_user(
-            username="owner", email="owner@example.com", password="pass123"
-        )
+        user = django_user_model.objects.create_user(username="owner", email="owner@example.com", password="pass123")
 
         hb1 = HymnBook.objects.create(name="Hinário 1", owner_name="Dono", owner_user=user)
 
@@ -99,13 +97,9 @@ class TestProfileEditView:
 
     def test_cannot_edit_other_profile(self, client, django_user_model):
         """Test that user cannot edit other user's profile."""
-        user1 = django_user_model.objects.create_user(
-            username="user1", email="user1@example.com", password="pass123"
-        )
+        user1 = django_user_model.objects.create_user(username="user1", email="user1@example.com", password="pass123")
 
-        user2 = django_user_model.objects.create_user(
-            username="user2", email="user2@example.com", password="pass123"
-        )
+        user2 = django_user_model.objects.create_user(username="user2", email="user2@example.com", password="pass123")
 
         client.force_login(user1)
 
