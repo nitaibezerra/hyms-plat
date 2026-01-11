@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Notificações - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="margin: 0 0 20px 0; color: #2c5282; font-size: 28px;">Notificações</h1>
+
+        {% if notifications %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for notification in notifications %}
+                <div style="
+                    padding: 15px;
+                    border-radius: 8px;
+                    border-left: 4px solid {% if notification.is_read %}#cbd5e0{% else %}#3182ce{% endif %};
+                    background: {% if notification.is_read %}#f7fafc{% else %}#ebf8ff{% endif %};
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: start;
+                ">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                            <span style="
+                                padding: 2px 8px;
+                                border-radius: 4px;
+                                font-size: 11px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                {% if notification.notification_type == 'comment' %}
+                                    background: #bee3f8; color: #2c5282;
+                                {% elif notification.notification_type == 'follow' %}
+                                    background: #c6f6d5; color: #276749;
+                                {% elif notification.notification_type == 'favorite' %}
+                                    background: #fed7d7; color: #742a2a;
+                                {% elif notification.notification_type == 'upload_approved' %}
+                                    background: #fef5d4; color: #744210;
+                                {% elif notification.notification_type == 'audio_approved' %}
+                                    background: #e9d8fd; color: #44337a;
+                                {% endif %}
+                            ">
+                                {{ notification.get_notification_type_display }}
+                            </span>
+                            <span style="color: #718096; font-size: 13px;">
+                                {{ notification.created_at|timesince }} atrás
+                            </span>
+                            {% if not notification.is_read %}
+                            <span style="
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 50%;
+                                background: #3182ce;
+                            "></span>
+                            {% endif %}
+                        </div>
+
+                        <h3 style="margin: 0 0 5px 0; color: #2d3748; font-size: 16px; font-weight: 600;">
+                            {{ notification.title }}
+                        </h3>
+
+                        <p style="margin: 0 0 8px 0; color: #4a5568; font-size: 14px;">
+                            {{ notification.message }}
+                        </p>
+
+                        {% if notification.sender %}
+                        <p style="margin: 0; color: #718096; font-size: 13px;">
+                            De: <a href="{% url 'users:profile' username=notification.sender.username %}" style="color: #3182ce; text-decoration: none;">
+                                {{ notification.sender.username }}
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    {% if notification.link %}
+                    <a href="{{ notification.link }}" class="btn btn-secondary" style="white-space: nowrap; margin-left: 15px;">
+                        Ver
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if notifications|length == 50 %}
+            <p style="text-align: center; color: #718096; font-size: 14px; margin-top: 20px;">
+                Mostrando as últimas 50 notificações
+            </p>
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">🔔</div>
+                <h2 style="margin: 0 0 10px 0; color: #4a5568; font-size: 20px;">
+                    Nenhuma notificação
+                </h2>
+                <p style="margin: 0; color: #718096;">
+                    Você será notificado quando houver novidades!
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

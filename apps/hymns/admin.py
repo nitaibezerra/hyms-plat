@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hymn, HymnBook
+from .models import Comment, Favorite, Hymn, HymnAudio, HymnBook, HymnBookVersion
 
 
 class HymnInline(admin.TabularInline):
@@ -12,6 +12,16 @@ class HymnInline(admin.TabularInline):
     ordering = ["number"]
 
 
+class HymnBookVersionInline(admin.TabularInline):
+    """Inline para exibir versões dentro do hinário."""
+
+    model = HymnBookVersion
+    extra = 0
+    fields = ["version_name", "is_primary", "uploaded_by", "pdf_file", "yaml_file", "created_at"]
+    readonly_fields = ["created_at"]
+    ordering = ["-is_primary", "-created_at"]
+
+
 @admin.register(HymnBook)
 class HymnBookAdmin(admin.ModelAdmin):
     """Admin para Hinários."""
@@ -21,7 +31,7 @@ class HymnBookAdmin(admin.ModelAdmin):
     search_fields = ["name", "intro_name", "owner_name", "description"]
     prepopulated_fields = {"slug": ("name",)}
     readonly_fields = ["id", "created_at", "updated_at", "hymn_count"]
-    inlines = [HymnInline]
+    inlines = [HymnBookVersionInline, HymnInline]
 
     fieldsets = [
         (
@@ -77,3 +87,131 @@ class HymnAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+
+@admin.register(HymnBookVersion)
+class HymnBookVersionAdmin(admin.ModelAdmin):
+    """Admin para Versões de Hinários."""
+
+    list_display = ["hymn_book", "version_name", "is_primary", "uploaded_by", "created_at"]
+    list_filter = ["is_primary", "created_at", "hymn_book"]
+    search_fields = ["hymn_book__name", "version_name", "description"]
+    readonly_fields = ["id", "created_at", "updated_at"]
+    list_select_related = ["hymn_book", "uploaded_by"]
+
+    fieldsets = [
+        (
+            "Informações Básicas",
+            {
+                "fields": ["hymn_book", "version_name", "description", "is_primary"],
+            },
+        ),
+        (
+            "Arquivos",
+            {
+                "fields": ["pdf_file", "yaml_file"],
+            },
+        ),
+        (
+            "Metadados",
+            {
+                "fields": ["id", "uploaded_by", "created_at", "updated_at"],
+                "classes": ["collapse"],
+            },
+        ),
+    ]
+
+
+@admin.register(HymnAudio)
+class HymnAudioAdmin(admin.ModelAdmin):
+    """Admin para Áudios de Hinos."""
+
+    list_display = ["hymn", "title", "format", "duration", "is_approved", "uploaded_by", "created_at"]
+    list_filter = ["is_approved", "format", "allow_download", "created_at"]
+    search_fields = ["hymn__title", "title", "source", "credits"]
+    readonly_fields = ["id", "file_size", "created_at", "updated_at"]
+    list_select_related = ["hymn", "hymn__hymn_book", "uploaded_by"]
+
+    fieldsets = [
+        (
+            "Hino",
+            {
+                "fields": ["hymn"],
+            },
+        ),
+        (
+            "Arquivo",
+            {
+                "fields": ["audio_file", "format", "duration", "file_size"],
+            },
+        ),
+        (
+            "Metadados",
+            {
+                "fields": ["title", "source", "recorded_at", "credits"],
+            },
+        ),
+        (
+            "Controle",
+            {
+                "fields": ["is_approved", "allow_download", "uploaded_by"],
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields": ["id", "created_at", "updated_at"],
+                "classes": ["collapse"],
+            },
+        ),
+    ]
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    """Admin para Favoritos."""
+
+    list_display = ["user", "hymn", "created_at"]
+    list_filter = ["created_at"]
+    search_fields = ["user__username", "hymn__title", "hymn__hymn_book__name"]
+    readonly_fields = ["id", "created_at"]
+    list_select_related = ["user", "hymn", "hymn__hymn_book"]
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    """Admin para Comentários."""
+
+    list_display = ["user", "hymn", "text_preview", "is_approved", "is_flagged", "created_at"]
+    list_filter = ["is_approved", "is_flagged", "created_at"]
+    search_fields = ["user__username", "hymn__title", "text"]
+    readonly_fields = ["id", "created_at", "updated_at"]
+    list_select_related = ["user", "hymn", "hymn__hymn_book"]
+
+    fieldsets = [
+        (
+            "Comentário",
+            {
+                "fields": ["hymn", "user", "text"],
+            },
+        ),
+        (
+            "Moderação",
+            {
+                "fields": ["is_approved", "is_flagged"],
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields": ["id", "created_at", "updated_at"],
+                "classes": ["collapse"],
+            },
+        ),
+    ]
+
+    def text_preview(self, obj):
+        """Preview do texto do comentário."""
+        return obj.text[:100] + "..." if len(obj.text) > 100 else obj.text
+
+    text_preview.short_description = "Comentário"

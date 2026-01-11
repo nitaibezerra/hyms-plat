@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Perfil - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="margin: 0 0 10px 0; color: #2c5282; font-size: 28px;">Editar Perfil</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            Atualize suas informações pessoais e foto de perfil
+        </p>
+
+        {% if form.errors %}
+        <div style="background: #fee; border-left: 4px solid #c33; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+            <p style="margin: 0; color: #c33; font-weight: bold;">Por favor, corrija os erros abaixo:</p>
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 20px;">
+                <label for="id_first_name" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                    Nome
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="id_last_name" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                    Sobrenome
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="id_bio" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                    Biografia
+                </label>
+                {{ form.bio }}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    Conte um pouco sobre você e sua conexão com os hinários
+                </p>
+                {% if form.bio.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.bio.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="id_avatar" style="display: block; margin-bottom: 5px; color: #2c5282; font-weight: 500;">
+                    Foto de Perfil
+                </label>
+                {% if profile_user.avatar %}
+                <div style="margin-bottom: 10px;">
+                    <img src="{{ profile_user.avatar.url }}"
+                         alt="Avatar atual"
+                         style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #2c5282;">
+                    <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">Avatar atual</p>
+                </div>
+                {% endif %}
+                {{ form.avatar }}
+                <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                    JPG, PNG ou GIF. Tamanho recomendado: 300x300px
+                </p>
+                {% if form.avatar.errors %}
+                <p style="color: #c33; font-size: 14px; margin: 5px 0 0 0;">{{ form.avatar.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button type="submit" class="btn" style="flex: 1;">
+                    Salvar Alterações
+                </button>
+                <a href="{% url 'users:profile' profile_user.username %}"
+                   class="btn btn-secondary"
+                   style="flex: 1; text-align: center; line-height: 2.5;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2c5282;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+</style>
+{% endblock %}
