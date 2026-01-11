@@ -5,6 +5,7 @@ Tests for Phase 3 models (HymnAudio, Favorite, Comment, UserFollow, Notification
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import IntegrityError
 
 from apps.hymns.models import Comment, Favorite, Hymn, HymnAudio, HymnBook
 from apps.users.models import Notification, UserFollow
@@ -78,7 +79,7 @@ class TestFavoriteModel:
 
         Favorite.objects.create(user=user, hymn=hymn)
 
-        with pytest.raises(Exception):  # IntegrityError
+        with pytest.raises(IntegrityError):
             Favorite.objects.create(user=user, hymn=hymn)
 
     def test_favorite_str(self):
@@ -144,7 +145,7 @@ class TestUserFollowModel:
 
         UserFollow.objects.create(follower=user1, followed=user2)
 
-        with pytest.raises(Exception):  # IntegrityError
+        with pytest.raises(IntegrityError):
             UserFollow.objects.create(follower=user1, followed=user2)
 
     def test_follow_str(self):

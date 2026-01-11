@@ -4,7 +4,7 @@ Forms for hymns app.
 
 from django import forms
 
-from .models import HymnBook, HymnBookVersion
+from .models import HymnBookVersion
 
 
 class HymnBookUploadForm(forms.Form):

@@ -94,9 +94,9 @@ class TestFindSimilarHymnbooks:
 
     def test_similarity_scores_ordered(self):
         """Test that results are ordered by similarity score."""
-        hb1 = HymnBook.objects.create(name="O Cruzeiro", owner_name="M1")
-        hb2 = HymnBook.objects.create(name="Cruzeiro", owner_name="M2")
-        hb3 = HymnBook.objects.create(name="Cruz", owner_name="M3")
+        HymnBook.objects.create(name="O Cruzeiro", owner_name="M1")
+        HymnBook.objects.create(name="Cruzeiro", owner_name="M2")
+        HymnBook.objects.create(name="Cruz", owner_name="M3")
 
         similar = find_similar_hymnbooks("O Cruzeiro", threshold=0.4, limit=5)
 

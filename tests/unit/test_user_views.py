@@ -6,7 +6,6 @@ import pytest
 from django.urls import reverse
 
 from apps.hymns.models import HymnBook
-from apps.users.models import User
 
 
 @pytest.mark.django_db

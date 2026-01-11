@@ -99,7 +99,7 @@ def upload_view(request):
         form = HymnBookUploadForm(request.POST, request.FILES)
         if form.is_valid():
             yaml_file = request.FILES["yaml_file"]
-            cover_image = request.FILES.get("cover_image")
+            # cover_image handled in preview step
 
             # Salva arquivo temporário para parsing
             with tempfile.NamedTemporaryFile(delete=False, suffix=".yaml") as tmp_file:

@@ -5,8 +5,7 @@ Tests for HymnBookVersion model.
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from apps.hymns.models import HymnBook, HymnBookVersion
-from apps.users.models import User
+from apps.hymns.models import HymnBookVersion
 
 
 @pytest.mark.django_db

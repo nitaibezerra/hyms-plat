@@ -94,7 +94,7 @@ class TestDisambiguationEdgeCases:
         total = len(result["high_confidence"]) + len(result["medium_confidence"]) + len(result["low_confidence"])
         assert total >= 0  # At least should not crash
 
-    def test_find_duplicates_with_None_hymns(self):
+    def test_find_duplicates_with_none_hymns(self):
         """Test with None instead of empty list."""
         HymnBook.objects.create(name="Test", owner_name="Owner")
 
